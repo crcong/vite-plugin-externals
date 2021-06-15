@@ -10,11 +10,11 @@ import { Externals, Options } from './types'
 const ID_FILTER_REG = /\.(js|ts|vue|jsx|tsx)$/
 const NODE_MODULES_FLAG = 'node_modules'
 
-export function viteExternalsPlugin(external: Externals = {}, userOptions: Options = {}): Plugin {
+export function viteExternalsPlugin(externals: Externals = {}, userOptions: Options = {}): Plugin {
   const { useWindow = true } = userOptions
   const windowContext = useWindow ? 'window.' : ''
   return {
-    name: 'vite-plugin-external',
+    name: 'vite-plugin-externals',
     async transform(code, id, ssr) {
       if (!isNeedExternal.call(this, userOptions, code, id, ssr)) {
         return
@@ -37,7 +37,7 @@ export function viteExternalsPlugin(external: Externals = {}, userOptions: Optio
           return
         }
 
-        const externalValue = external[dependence]
+        const externalValue = externals[dependence]
         if (!externalValue) {
           return
         }
