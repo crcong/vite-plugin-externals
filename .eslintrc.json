@@ -1,0 +1,3 @@
+{
+  "extends": "@crcong/eslint-config-typescript"
+}

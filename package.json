@@ -1,0 +1,50 @@
+{
+  "name": "vite-plugin-externals",
+  "version": "0.0.0",
+  "description": "externals plugin for vite",
+  "author": "crcong",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/crcong/vite-plugin-externals"
+  },
+  "homepage": "https://github.com/crcong/vite-plugin-externals",
+  "bugs": "https://github.com/crcong/vite-plugin-externals/issues",
+  "license": "MIT",
+  "scripts": {
+    "dev": "tsc -w",
+    "build": "pnpm lint:fix && rimraf dist && tsc && pnpm build:es",
+    "build:es": "tsc --module ESNEXT --outDir dist/es",
+    "lint:fix": "eslint --fix ./src/**/*.ts",
+    "release": "npx bumpp --push --tag --commit && npm publish"
+  },
+  "files": [
+    "dist",
+    "index.d.ts"
+  ],
+  "keywords": [
+    "vite-plugin",
+    "external",
+    "externals"
+  ],
+  "types": "index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/es/index.js",
+  "peerDependencies": {
+    "vite": "^2.0.0"
+  },
+  "devDependencies": {
+    "@crcong/eslint-config-typescript": "^0.1.4",
+    "@types/estree": "^0.0.48",
+    "@types/node": "^15.12.2",
+    "eslint": "^7.28.0",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.51.2",
+    "typescript": "^4.3.2",
+    "vite": "^2.3.7"
+  },
+  "dependencies": {
+    "acorn": "^8.4.0",
+    "es-module-lexer": "^0.4.1",
+    "magic-string": "^0.25.7"
+  }
+}

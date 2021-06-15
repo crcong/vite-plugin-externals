@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "CommonJS",
+    "noImplicitAny": true,
+    "preserveConstEnums": true,
+    "removeComments": true,
+    "outDir": "./dist/",
+    "declaration": true,
+    "strict": true,
+    "moduleResolution": "Node",
+  },
+  "files": [
+    "./src/index.ts"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
+}
