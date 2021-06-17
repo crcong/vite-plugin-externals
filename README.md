@@ -1,5 +1,7 @@
 # vite-plugin-externals
 
+English | [简体中文](README.zh-CN.md)
+
 use to external resources, like webpack externals, but only use in browser now.
 
 Can be used in `production` mode without other `rollup` configuration.
