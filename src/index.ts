@@ -12,7 +12,12 @@ const NODE_MODULES_FLAG = 'node_modules'
 
 export function viteExternalsPlugin(externals: Externals = {}, userOptions: Options = {}): Plugin {
   const { useWindow = true } = userOptions
-  const windowContext = useWindow ? 'window.' : ''
+  const windowContext = (moduleId: string) => {
+    if (!useWindow) {
+      return moduleId
+    }
+    return `window['${moduleId}']`
+  }
   return {
     name: 'vite-plugin-externals',
     async transform(code, id, ssr) {
@@ -56,10 +61,10 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
         const newImportStr = specifiers.reduce((s, specifier) => {
           const { local } = specifier
           if (specifier.type === 'ImportDefaultSpecifier') {
-            s += `const ${local.name} = ${windowContext}${externalValue}\n`
+            s += `const ${local.name} = ${windowContext(externalValue)}\n`
           } else if (specifier.type === 'ImportSpecifier') {
             const { imported } = specifier
-            s += `const ${local.name} = ${windowContext}${externalValue}.${imported.name}\n`
+            s += `const ${local.name} = ${windowContext(externalValue)}.${imported.name}\n`
           }
           return s
         }, '')
