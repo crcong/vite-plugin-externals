@@ -42,13 +42,13 @@ viteExternalsPlugin({
 // source code
 import Vue from 'vue'
 // transformed
-const Vue = window.Vue
+const Vue = window['Vue']
 
 // source code
 import { reactive, ref as r } from 'vue'
 // transformed
-const reactive = window.Vue.reactive
-const r = window.Vue.ref
+const reactive = window['Vue'].reactive
+const r = window['Vue'].ref
 ```
 
 **Warning**: please use the plugin after converting to JS code, because the plugin only transform JS code. Eg.
@@ -91,6 +91,8 @@ viteExternalsPlugin({
 
 set `false`, the `window` prefix will not be added.
 
+**Warning**: If your module name has special characters, such as `/`, set useWindow option `false`, will throw error.
+
 ```js
 viteExternalsPlugin({
   vue: 'Vue',
@@ -98,6 +100,6 @@ viteExternalsPlugin({
 
 // source code
 import Vue from 'vue'
-// transformed, no `const Vue = window.Vue`
+// transformed, no `const Vue = window['Vue']`
 const Vue = Vue
 ```

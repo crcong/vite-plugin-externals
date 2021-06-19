@@ -42,13 +42,13 @@ viteExternalsPlugin({
 // 源代码
 import Vue from 'vue'
 // 转换后
-const Vue = window.Vue
+const Vue = window['Vue']
 
 // 源代码
 import { reactive, ref as r } from 'vue'
 // 转换后
-const reactive = window.Vue.reactive
-const r = window.Vue.ref
+const reactive = window['Vue'].reactive
+const r = window['Vue'].ref
 ```
 
 **注意**: 请使用该插件前，需要把代码转换成js，因为此插件只能解析js代码，例如：
@@ -91,6 +91,8 @@ viteExternalsPlugin({
 
 默认为 `true` , 设置 `false` , `window` 的作用域将不会加上。
 
+**注意**: 如果模块名有特殊字符，例如 `/`，设置useWindow选项 `false` 将引发错误。
+
 ```js
 viteExternalsPlugin({
   vue: 'Vue',
@@ -98,6 +100,6 @@ viteExternalsPlugin({
 
 // 源代码
 import Vue from 'vue'
-// 转换后, 不是 `const Vue = window.Vue`
+// 转换后, 不是 `const Vue = window['Vue']`
 const Vue = Vue
 ```
