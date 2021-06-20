@@ -15,7 +15,7 @@
     "build": "pnpm lint:fix && rimraf dist && tsc && pnpm build:es",
     "build:es": "tsc --module ESNEXT --outDir dist/es",
     "lint:fix": "eslint --fix ./src/**/*.ts",
-    "release": "npx bumpp --push --tag --commit && npm publish"
+    "release": "pnpm build && npx bumpp --push --tag --commit && npm publish"
   },
   "files": [
     "dist",
