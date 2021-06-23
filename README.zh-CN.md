@@ -49,6 +49,11 @@ import { reactive, ref as r } from 'vue'
 // 转换后
 const reactive = window['Vue'].reactive
 const r = window['Vue'].ref
+
+// 源代码
+import * as vue from 'vue'
+// 转换后
+const vue = window['Vue']
 ```
 
 **注意**: 请使用该插件前，需要把代码转换成js，因为此插件只能解析js代码，例如：

@@ -49,6 +49,11 @@ import { reactive, ref as r } from 'vue'
 // transformed
 const reactive = window['Vue'].reactive
 const r = window['Vue'].ref
+
+// source code
+import * as vue from 'vue'
+// transformed
+const vue = window['Vue']
 ```
 
 **Warning**: please use the plugin after converting to JS code, because the plugin only transform JS code. Eg.
