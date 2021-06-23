@@ -65,6 +65,9 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
           } else if (specifier.type === 'ImportSpecifier') {
             const { imported } = specifier
             s += `const ${local.name} = ${transofrmModuleName(externalValue)}.${imported.name}\n`
+          } else if (specifier.type === 'ImportNamespaceSpecifier') {
+            // import * from 'xxx'
+            s += `const ${local.name} = ${transofrmModuleName(externalValue)}\n`
           }
           return s
         }, '')
