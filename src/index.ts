@@ -12,7 +12,7 @@ const NODE_MODULES_FLAG = 'node_modules'
 
 export function viteExternalsPlugin(externals: Externals = {}, userOptions: Options = {}): Plugin {
   const { useWindow = true } = userOptions
-  const transofrmModuleName = (moduleId: string) => {
+  const transformModuleName = (moduleId: string) => {
     if (!useWindow) {
       return moduleId
     }
@@ -61,13 +61,13 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
         const newImportStr = specifiers.reduce((s, specifier) => {
           const { local } = specifier
           if (specifier.type === 'ImportDefaultSpecifier') {
-            s += `const ${local.name} = ${transofrmModuleName(externalValue)}\n`
+            s += `const ${local.name} = ${transformModuleName(externalValue)}\n`
           } else if (specifier.type === 'ImportSpecifier') {
             const { imported } = specifier
-            s += `const ${local.name} = ${transofrmModuleName(externalValue)}.${imported.name}\n`
+            s += `const ${local.name} = ${transformModuleName(externalValue)}.${imported.name}\n`
           } else if (specifier.type === 'ImportNamespaceSpecifier') {
             // import * from 'xxx'
-            s += `const ${local.name} = ${transofrmModuleName(externalValue)}\n`
+            s += `const ${local.name} = ${transformModuleName(externalValue)}\n`
           }
           return s
         }, '')
