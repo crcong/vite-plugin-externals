@@ -1,5 +1,17 @@
 # vite-plugin-externals
 
+<p>
+  <a href="https://www.npmjs.com/package/vite-plugin-externals" target="_blank">
+    <img alt="NPM package" src="https://img.shields.io/npm/v/vite-plugin-externals.svg?style=flat">
+  </a>
+  <a href="https://www.npmjs.com/package/vite-plugin-externals" target="_blank">
+    <img alt="downloads" src="https://img.shields.io/npm/dt/vite-plugin-externals.svg?style=flat">
+  </a>
+  <a href="https://github.com/vitejs/awesome-vite#helpers" target="_blank">
+    <img src="https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg" alt="Awesome">
+  </a>
+</p>
+
 [English](README.md) | 简体中文
 
 使用外部库，类似webpack的externals，但现在只支持浏览器环境。
