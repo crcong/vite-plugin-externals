@@ -56,10 +56,16 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
         const newImportStr = replaceImports(specifiers, externalValue, userOptions)
         s.overwrite(statementStart, statementEnd, newImportStr)
       })
-      code = s ? s.toString() : code
+      if (!s) {
+        return
+      }
       return {
-        code,
-        map: s ? s.generateMap({ hires: true }) : null,
+        code: s.toString(),
+        map: s.generateMap({
+          source: id,
+          includeContent: true,
+          hires: true,
+        }),
       }
     },
   }
