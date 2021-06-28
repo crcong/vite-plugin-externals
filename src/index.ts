@@ -6,18 +6,13 @@ import { Parser } from 'acorn'
 import * as ESTree from 'estree'
 import { Externals, Options } from './types'
 
+type Specifiers = (ESTree.ImportSpecifier | ESTree.ImportDefaultSpecifier | ESTree.ImportNamespaceSpecifier)[]
+
 // constants
 const ID_FILTER_REG = /\.(js|ts|vue|jsx|tsx)$/
 const NODE_MODULES_FLAG = 'node_modules'
 
 export function viteExternalsPlugin(externals: Externals = {}, userOptions: Options = {}): Plugin {
-  const { useWindow = true } = userOptions
-  const transformModuleName = (moduleId: string) => {
-    if (!useWindow) {
-      return moduleId
-    }
-    return `window['${moduleId}']`
-  }
   return {
     name: 'vite-plugin-externals',
     async transform(code, id, ssr) {
@@ -58,19 +53,7 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
         if (!specifiers) {
           return
         }
-        const newImportStr = specifiers.reduce((s, specifier) => {
-          const { local } = specifier
-          if (specifier.type === 'ImportDefaultSpecifier') {
-            s += `const ${local.name} = ${transformModuleName(externalValue)}\n`
-          } else if (specifier.type === 'ImportSpecifier') {
-            const { imported } = specifier
-            s += `const ${local.name} = ${transformModuleName(externalValue)}.${imported.name}\n`
-          } else if (specifier.type === 'ImportNamespaceSpecifier') {
-            // import * from 'xxx'
-            s += `const ${local.name} = ${transformModuleName(externalValue)}\n`
-          }
-          return s
-        }, '')
+        const newImportStr = replaceImports(specifiers, externalValue, userOptions)
         s.overwrite(statementStart, statementEnd, newImportStr)
       })
       code = s ? s.toString() : code
@@ -80,6 +63,47 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
       }
     },
   }
+}
+
+function replaceImports(
+  specifiers: Specifiers,
+  externalValue: string,
+  options: Options,
+) {
+  const { useWindow = true } = options
+  const transformModuleName = (moduleId: string) => {
+    if (!useWindow) {
+      return moduleId
+    }
+    return `window['${moduleId}']`
+  }
+  return specifiers.reduce((s, specifier) => {
+    const { local } = specifier
+    if (specifier.type === 'ImportDefaultSpecifier') {
+      /**
+       * source code: import Vue from 'vue'
+       * transformed: const Vue = window['Vue']
+       */
+      s += `const ${local.name} = ${transformModuleName(externalValue)}\n`
+    } else if (specifier.type === 'ImportSpecifier') {
+      /**
+       * source code:
+       * import { reactive, ref as r } from 'vue'
+       * transformed:
+       * const reactive = window['Vue'].reactive
+       * const r = window['Vue'].ref
+       */
+      const { imported } = specifier
+      s += `const ${local.name} = ${transformModuleName(externalValue)}.${imported.name}\n`
+    } else if (specifier.type === 'ImportNamespaceSpecifier') {
+      /**
+       * source code: import * as vue from 'vue'
+       * transformed: const vue = window['Vue']
+       */
+      s += `const ${local.name} = ${transformModuleName(externalValue)}\n`
+    }
+    return s
+  }, '')
 }
 
 function isNeedExternal(
