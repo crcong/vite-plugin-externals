@@ -42,6 +42,18 @@ export default {
   ]
 }
 ```
+
+**警告**: 如果你在开发环境中，引入了生产环境的库, 可能会使得 `HMR` 失败。
+
+例如：
+```html
+<!-- 可能会使 HMR 失败 -->
+<script src="./vue.global.prod.js"></script>
+
+<!-- 这样不会 -->
+<script src="./vue.global.js"></script>
+```
+
 ## 原理
 
 转换js的源代码。

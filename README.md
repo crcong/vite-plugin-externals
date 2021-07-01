@@ -42,6 +42,18 @@ export default {
   ]
 }
 ```
+
+**Warning**: If you loaded `production` libray in `vite dev mode` , may make `HMR` **fail**.
+
+Eg.
+```html
+<!-- may make HMR fail -->
+<script src="./vue.global.prod.js"></script>
+
+<!-- good -->
+<script src="./vue.global.js"></script>
+```
+
 ## How to work
 
 transform source code of js file.
