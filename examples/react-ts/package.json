@@ -6,6 +6,8 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "antd": "^4.16.11",
+    "less": "^4.1.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   },

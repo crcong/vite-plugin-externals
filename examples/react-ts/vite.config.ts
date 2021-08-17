@@ -11,4 +11,12 @@ export default defineConfig({
       'react-dom': 'ReactDOM',
     }),
   ],
+  css: {
+    preprocessorOptions: {
+      less: {
+        // 允许链式调用的换行
+        javascriptEnabled: true,
+      },
+    },
+  },
 })
