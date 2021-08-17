@@ -1,5 +1,5 @@
 <template>
-  <p>test externals</p>
+  <el-button type="primary">test externals</el-button>
 </template>
 
 <script setup>
