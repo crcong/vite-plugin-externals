@@ -18,6 +18,8 @@ const NODE_MODULES_FLAG = 'node_modules'
 const CACHE_DIR = '.vite-plugin-externals'
 
 export function viteExternalsPlugin(externals: Externals = {}, userOptions: Options = {}): Plugin {
+  let isBuild = false
+
   const externalsKeys = Object.keys(externals)
   const isExternalEmpty = externalsKeys.length === 0
   const cachePath = path.join(process.cwd(), NODE_MODULES_FLAG, CACHE_DIR)
@@ -33,7 +35,9 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
 
   return {
     name: 'vite-plugin-externals',
-    async config(config, { mode }) {
+    async config(config, { mode, command }) {
+      isBuild = command === 'build'
+
       if (mode !== 'development') {
         return
       }
@@ -71,7 +75,7 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
       return config
     },
     async transform(code, id, ssr) {
-      if (!isNeedExternal.call(this, userOptions, code, id, ssr)) {
+      if (!isNeedExternal.call(this, userOptions, code, id, isBuild, ssr)) {
         return
       }
       await init
@@ -165,6 +169,7 @@ function isNeedExternal(
   options: Options,
   code: string,
   id: string,
+  isBuild: boolean,
   ssr?: boolean,
 ): boolean {
   const {
@@ -183,7 +188,7 @@ function isNeedExternal(
   } else {
     if (
       !ID_FILTER_REG.test(id) ||
-      id.includes(NODE_MODULES_FLAG)
+      (id.includes(NODE_MODULES_FLAG) && !isBuild)
     ) {
       return false
     }
