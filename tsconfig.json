@@ -9,6 +9,7 @@
     "declaration": true,
     "strict": true,
     "moduleResolution": "Node",
+    "esModuleInterop": true,
   },
   "files": [
     "./src/index.ts"

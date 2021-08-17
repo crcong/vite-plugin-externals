@@ -1,20 +1,75 @@
 import { TransformPluginContext } from 'rollup'
-import type { Plugin } from 'vite'
+import type { Plugin, Alias } from 'vite'
 import MagicString from 'magic-string'
 import { init, parse } from 'es-module-lexer'
 import { Parser } from 'acorn'
 import * as ESTree from 'estree'
 import { Externals, Options } from './types'
+import { isObject } from './utils'
+import { ensureFile, writeFile, ensureDir, emptyDirSync } from 'fs-extra'
+import path from 'path'
 
 type Specifiers = (ESTree.ImportSpecifier | ESTree.ImportDefaultSpecifier | ESTree.ImportNamespaceSpecifier)[]
+type TransformModuleNameFn = (externalValue: string) => string
 
 // constants
 const ID_FILTER_REG = /\.(js|ts|vue|jsx|tsx)$/
 const NODE_MODULES_FLAG = 'node_modules'
+const CACHE_DIR = '.vite-plugin-externals'
 
 export function viteExternalsPlugin(externals: Externals = {}, userOptions: Options = {}): Plugin {
+  const externalsKeys = Object.keys(externals)
+  const isExternalEmpty = externalsKeys.length === 0
+  const cachePath = path.join(process.cwd(), NODE_MODULES_FLAG, CACHE_DIR)
+
+  const transformModuleName: TransformModuleNameFn = ((useWindow) => {
+    return (externalValue: string) => {
+      if (useWindow === false) {
+        return externalValue
+      }
+      return `window['${externalValue}']`
+    }
+  })(userOptions.useWindow ?? true)
+
   return {
     name: 'vite-plugin-externals',
+    async config(config, { mode }) {
+      if (mode !== 'development') {
+        return
+      }
+      if (isExternalEmpty) {
+        return
+      }
+      const newAlias: Alias[] = []
+      const alias = config.resolve?.alias ?? {}
+      if (isObject(alias)) {
+        Object.keys(alias).forEach((aliasKey) => {
+          newAlias.push({ find: aliasKey, replacement: (alias as Record<string, string>)[aliasKey] })
+        })
+      } else if (Array.isArray(alias)) {
+        newAlias.push(...alias)
+      }
+
+      await ensureDir(cachePath)
+      await emptyDirSync(cachePath)
+
+      for await (const externalKey of externalsKeys) {
+        const externalCachePath = path.join(cachePath, `${externalKey}.js`)
+        newAlias.push({ find: new RegExp(`^${externalKey}$`), replacement: externalCachePath })
+        await ensureFile(externalCachePath)
+        await writeFile(
+          externalCachePath,
+          `module.exports = ${transformModuleName(externals[externalKey])};`,
+        )
+      }
+
+      config.resolve = {
+        ...(config.resolve ?? {}),
+        alias: newAlias,
+      }
+
+      return config
+    },
     async transform(code, id, ssr) {
       if (!isNeedExternal.call(this, userOptions, code, id, ssr)) {
         return
@@ -53,7 +108,7 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
         if (!specifiers) {
           return
         }
-        const newImportStr = replaceImports(specifiers, externalValue, userOptions)
+        const newImportStr = replaceImports(specifiers, externalValue, transformModuleName)
         s.overwrite(statementStart, statementEnd, newImportStr)
       })
       if (!s) {
@@ -74,15 +129,8 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
 function replaceImports(
   specifiers: Specifiers,
   externalValue: string,
-  options: Options,
+  transformModuleName: TransformModuleNameFn,
 ) {
-  const { useWindow = true } = options
-  const transformModuleName = (moduleId: string) => {
-    if (!useWindow) {
-      return moduleId
-    }
-    return `window['${moduleId}']`
-  }
   return specifiers.reduce((s, specifier) => {
     const { local } = specifier
     if (specifier.type === 'ImportDefaultSpecifier') {
