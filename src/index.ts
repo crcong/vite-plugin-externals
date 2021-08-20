@@ -78,6 +78,9 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
       if (!isNeedExternal.call(this, userOptions, code, id, isBuild, ssr)) {
         return
       }
+      if (isBuild && id.includes(NODE_MODULES_FLAG)) {
+        code = replaceRequires(code, externals, transformModuleName)
+      }
       await init
       const [imports] = parse(code)
       let s: undefined | MagicString
@@ -116,7 +119,7 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
         s.overwrite(statementStart, statementEnd, newImportStr)
       })
       if (!s) {
-        return
+        return { code }
       }
       return {
         code: s.toString(),
@@ -128,6 +131,18 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
       }
     },
   }
+}
+
+function replaceRequires(
+  code: string,
+  externals: Externals,
+  transformModuleName: TransformModuleNameFn,
+) {
+  // It's not a good method, but I feel it can cover most scenes
+  return Object.keys(externals).reduce((code, externalKey) => {
+    const r = new RegExp(`require\\((["'\`])\\s*${externalKey}\\s*(\\1)\\)`, 'g')
+    return code.replace(r, transformModuleName(externals[externalKey]))
+  }, code)
 }
 
 function replaceImports(
