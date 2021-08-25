@@ -38,6 +38,8 @@ export default {
       vue: 'Vue',
       react: 'React',
       'react-dom': 'ReactDOM',
+      // value support chain, tranform to window['React']['lazy']
+      lazy: ['React', 'lazy']
     }),
   ]
 }

@@ -38,6 +38,8 @@ export default {
       vue: 'Vue',
       react: 'React',
       'react-dom': 'ReactDOM',
+      // 支持值链式取值，会转换成 window['React']['lazy']
+      lazy: ['React', 'lazy']
     }),
   ]
 }
