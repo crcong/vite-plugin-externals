@@ -29,7 +29,8 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
       if (useWindow === false) {
         return externalValue
       }
-      return `window['${externalValue}']`
+      const vals = externalValue.split('.').map((val)=>`['${val}']`).join('')
+      return `window${vals}`;
     }
   })(userOptions.useWindow ?? true)
 
