@@ -4,13 +4,13 @@ import MagicString from 'magic-string'
 import { init, parse } from 'es-module-lexer'
 import { Parser } from 'acorn'
 import * as ESTree from 'estree'
-import { Externals, Options } from './types'
+import { Externals, ExternalValue, Options } from './types'
 import { isObject } from './utils'
 import { ensureFile, writeFile, ensureDir, emptyDirSync } from 'fs-extra'
 import path from 'path'
 
 type Specifiers = (ESTree.ImportSpecifier | ESTree.ImportDefaultSpecifier | ESTree.ImportNamespaceSpecifier)[]
-type TransformModuleNameFn = (externalValue: string) => string
+type TransformModuleNameFn = (externalValue: ExternalValue) => string
 
 // constants
 const ID_FILTER_REG = /\.(js|ts|vue|jsx|tsx)$/
@@ -25,15 +25,15 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
   const cachePath = path.join(process.cwd(), NODE_MODULES_FLAG, CACHE_DIR)
 
   const transformModuleName: TransformModuleNameFn = ((useWindow) => {
-    return (externalValue: string) => {
+    return (externalValue: ExternalValue) => {
       if (useWindow === false) {
-        return externalValue
+        return typeof externalValue === 'string' ? externalValue : externalValue.join('.')
       }
       if (typeof externalValue === 'string') {
         return `window['${externalValue}']`
       }
-      const vals = externalValue.map((val)=>`['${val}']`).join('')
-      return `window${vals}`;
+      const vals = externalValue.map((val) => `['${val}']`).join('')
+      return `window${vals}`
     }
   })(userOptions.useWindow ?? true)
 
@@ -151,7 +151,7 @@ function replaceRequires(
 
 function replaceImports(
   specifiers: Specifiers,
-  externalValue: string,
+  externalValue: ExternalValue,
   transformModuleName: TransformModuleNameFn,
 ) {
   return specifiers.reduce((s, specifier) => {
