@@ -1,7 +1,7 @@
 
 import { TransformPluginContext } from 'rollup'
 
-export type Externals = Record<string, string>
+export type Externals = Record<string, string | string[]>
 
 export interface Options {
     /**
