@@ -9,7 +9,7 @@ import { isObject } from './utils'
 import { ensureFile, writeFile, ensureDir, emptyDirSync } from 'fs-extra'
 import path from 'path'
 
-type Specifiers = (ESTree.ImportSpecifier | ESTree.ImportDefaultSpecifier | ESTree.ImportNamespaceSpecifier)[]
+type Specifiers = (ESTree.ImportSpecifier | ESTree.ImportDefaultSpecifier | ESTree.ImportNamespaceSpecifier | ESTree.ExportSpecifier)[]
 type TransformModuleNameFn = (externalValue: ExternalValue) => string
 
 // constants
@@ -178,6 +178,31 @@ function replaceImports(
        * transformed: const vue = window['Vue']
        */
       s += `const ${local.name} = ${transformModuleName(externalValue)}\n`
+    } else if (specifier.type === 'ExportSpecifier') {
+      /**
+       * Re-export default import as named export
+       * source code: export { default as React } from 'react'
+       * transformed: export const React = window['React']
+       *
+       * Re-export default import as default export
+       * source code: export { default } from 'react'
+       * transformed: export default = window['React']
+       *
+       * Re-export named import
+       * source code: export { useState } from 'react'
+       * transformed: export const useState = window['React'].useState
+       *
+       * Re-export named import as renamed export
+       * source code: export { useState as useState2 } from 'react'
+       * transformed: export const useState2 = window['React'].useState
+       */
+      const { exported } = specifier
+      const value = `${transformModuleName(externalValue)}${local.name !== 'default' ? `.${local.name}` : ''}`
+      if (exported.name === 'default') {
+        s += `export default ${value}\n`
+      } else {
+        s += `export const ${exported.name} = ${value}\n`
+      }
     }
     return s
   }, '')
