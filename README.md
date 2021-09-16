@@ -80,6 +80,11 @@ const r = window['Vue'].ref
 import * as vue from 'vue'
 // transformed
 const vue = window['Vue']
+
+// source code
+export { useState as _useState } from 'react'
+// transformed
+export const _useState = window['React'].useState
 ```
 
 **Warning**: please use the plugin after converting to JS code, because the plugin only transform JS code. Eg.

@@ -80,6 +80,11 @@ const r = window['Vue'].ref
 import * as vue from 'vue'
 // 转换后
 const vue = window['Vue']
+
+// 源代码
+export { useState as _useState } from 'react'
+// 转换后
+export const _useState = window['React'].useState
 ```
 
 **注意**: 请使用该插件前，需要把代码转换成js，因为此插件只能解析js代码，例如：
