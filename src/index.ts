@@ -78,7 +78,8 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
 
       return config
     },
-    async transform(code, id, ssr) {
+    async transform(code, id, options) {
+      const ssr = compatSsrInOptions(options)
       if (!isNeedExternal.call(this, userOptions, code, id, isBuild, ssr)) {
         return
       }
@@ -238,4 +239,11 @@ function isNeedExternal(
     }
   }
   return true
+}
+
+function compatSsrInOptions(options: { ssr?: boolean } | undefined): boolean {
+  if (typeof options === 'boolean') {
+    return options
+  }
+  return options?.ssr ?? false
 }
