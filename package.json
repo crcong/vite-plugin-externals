@@ -37,6 +37,7 @@
     "@types/estree": "^0.0.48",
     "@types/fs-extra": "^9.0.12",
     "@types/node": "^15.12.2",
+    "@types/ws": "^8.2.2",
     "bumpp": "^7.1.1",
     "eslint": "^7.28.0",
     "rimraf": "^3.0.2",

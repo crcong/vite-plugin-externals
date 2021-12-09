@@ -8,6 +8,7 @@ importers:
       '@types/estree': ^0.0.48
       '@types/fs-extra': ^9.0.12
       '@types/node': ^15.12.2
+      '@types/ws': ^8.2.2
       acorn: ^8.4.0
       bumpp: ^7.1.1
       es-module-lexer: ^0.4.1
@@ -28,6 +29,7 @@ importers:
       '@types/estree': 0.0.48
       '@types/fs-extra': 9.0.12
       '@types/node': 15.12.2
+      '@types/ws': 8.2.2
       bumpp: 7.1.1
       eslint: 7.28.0
       rimraf: 3.0.2
@@ -541,6 +543,10 @@ packages:
     resolution: {integrity: sha512-FA45p37/mLhpebgbPWWCKfOisTjxGK9lwcHlJ6XVLfu3NgfcazOJHdYUZCWPMK8QX4LhNZdmfo6iMz9FqpUbaw==}
     dev: true
 
+  /@types/node/15.14.9:
+    resolution: {integrity: sha512-qjd88DrCxupx/kJD5yQgZdcYKZKSIGBVDIBE1/LTGcNm3d2Np/jxojkdePDdfnBHJc5W7vSMpbJ1aB7p/Py69A==}
+    dev: true
+
   /@types/prop-types/15.7.3:
     resolution: {integrity: sha512-KfRL3PuHmqQLOG+2tGpRO26Ctg+Cq1E01D2DMriKEATHgWLfeNDmq9e29Q9WIky0dQ3NPkd1mzYH8Lm936Z9qw==}
     dev: true
@@ -561,6 +567,12 @@ packages:
 
   /@types/scheduler/0.16.1:
     resolution: {integrity: sha512-EaCxbanVeyxDRTQBkdLb3Bvl/HK7PBK6UJjsSixB0iHKoWxE5uu2Q/DgtpOhPIojN0Zl1whvOd7PoHs2P0s5eA==}
+    dev: true
+
+  /@types/ws/8.2.2:
+    resolution: {integrity: sha512-NOn5eIcgWLOo6qW8AcuLZ7G8PycXu0xTxxkS6Q18VWFxgPUSOwV0pBj2a/4viNZVu25i7RIB7GttdkAIUUXOOg==}
+    dependencies:
+      '@types/node': 15.14.9
     dev: true
 
   /@typescript-eslint/eslint-plugin/4.26.1_c8cbd5e7f5f92609ec78d991aced454b:
