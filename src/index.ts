@@ -124,7 +124,7 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
         s.overwrite(statementStart, statementEnd, newImportStr)
       })
       if (!s) {
-        return { code }
+        return { code, map: null }
       }
       return {
         code: s.toString(),
