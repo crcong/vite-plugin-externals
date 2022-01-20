@@ -13,7 +13,7 @@ type Specifiers = (ESTree.ImportSpecifier | ESTree.ImportDefaultSpecifier | ESTr
 type TransformModuleNameFn = (externalValue: ExternalValue) => string
 
 // constants
-const ID_FILTER_REG = /\.(js|ts|vue|jsx|tsx)$/
+const ID_FILTER_REG = /\.(mjs|js|ts|vue|jsx|tsx)(\?.*|)$/
 const NODE_MODULES_FLAG = 'node_modules'
 const CACHE_DIR = '.vite-plugin-externals'
 
