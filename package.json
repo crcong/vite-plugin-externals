@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-externals",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "externals plugin for vite",
   "author": "crcong",
   "repository": {
