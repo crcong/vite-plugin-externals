@@ -83,47 +83,55 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
       if (!isNeedExternal.call(this, userOptions, code, id, isBuild, ssr)) {
         return
       }
-      if (isBuild && id.includes(NODE_MODULES_FLAG)) {
-        code = replaceRequires(code, externals, transformModuleName)
-      }
-      await init
-      const [imports] = parse(code)
       let s: undefined | MagicString
-      imports.forEach(({
-        d: dynamic,
-        n: dependence,
-        ss: statementStart,
-        se: statementEnd,
-      }) => {
-        // filter dynamic import
-        if (dynamic !== -1) {
-          return
+      let hasError = false
+      try {
+        if (isBuild && id.includes(NODE_MODULES_FLAG)) {
+          code = replaceRequires(code, externals, transformModuleName)
         }
+        await init
+        const [imports] = parse(code)
+        imports.forEach(({
+          d: dynamic,
+          n: dependence,
+          ss: statementStart,
+          se: statementEnd,
+        }) => {
+          // filter dynamic import
+          if (dynamic !== -1) {
+            return
+          }
 
-        if (!dependence) {
-          return
+          if (!dependence) {
+            return
+          }
+
+          const externalValue = externals[dependence]
+          if (!externalValue) {
+            return
+          }
+
+          s = s || (s = new MagicString(code))
+
+          const raw = code.substring(statementStart, statementEnd)
+          const ast = Parser.parse(raw, {
+            ecmaVersion: 'latest',
+            sourceType: 'module',
+          }) as unknown as ESTree.Program
+          const specifiers = (ast.body[0] as (ESTree.ImportDeclaration))?.specifiers
+          if (!specifiers) {
+            return
+          }
+          const newImportStr = replaceImports(specifiers, externalValue, transformModuleName)
+          s.overwrite(statementStart, statementEnd, newImportStr)
+        })
+      } catch (error) {
+        hasError = true
+        if (userOptions.debug) {
+          console.error(error)
         }
-
-        const externalValue = externals[dependence]
-        if (!externalValue) {
-          return
-        }
-
-        s = s || (s = new MagicString(code))
-
-        const raw = code.substring(statementStart, statementEnd)
-        const ast = Parser.parse(raw, {
-          ecmaVersion: 'latest',
-          sourceType: 'module',
-        }) as unknown as ESTree.Program
-        const specifiers = (ast.body[0] as (ESTree.ImportDeclaration))?.specifiers
-        if (!specifiers) {
-          return
-        }
-        const newImportStr = replaceImports(specifiers, externalValue, transformModuleName)
-        s.overwrite(statementStart, statementEnd, newImportStr)
-      })
-      if (!s) {
+      }
+      if (hasError || !s) {
         return { code, map: null }
       }
       return {

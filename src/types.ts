@@ -23,4 +23,9 @@ export interface Options {
      * @default true
      */
     useWindow?: boolean
+
+    /**
+     * debug console
+     */
+    debug?: boolean
 }
