@@ -139,3 +139,7 @@ import Vue from 'vue'
 // transformed, no `const Vue = window['Vue']`
 const Vue = Vue
 ```
+
+### sourceMapOptions
+
+The configuration item of the code sourcemap after code conversion. The library is `magic-string`.

@@ -139,3 +139,7 @@ import Vue from 'vue'
 // 转换后, 不是 `const Vue = window['Vue']`
 const Vue = Vue
 ```
+
+### sourceMapOptions
+
+转换后代码sourceMap的配置项，库是 `magic-string` 。
