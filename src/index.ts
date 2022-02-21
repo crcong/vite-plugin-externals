@@ -136,11 +136,11 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
       }
       return {
         code: s.toString(),
-        map: s.generateMap({
+        map: s.generateMap(Object.assign({}, {
           source: id,
           includeContent: true,
           hires: true,
-        }),
+        }, userOptions.sourceMapOptions)),
       }
     },
   }

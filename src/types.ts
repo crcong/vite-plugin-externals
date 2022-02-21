@@ -1,5 +1,6 @@
 
 import { TransformPluginContext } from 'rollup'
+import { SourceMapOptions } from 'magic-string'
 
 export type ExternalValue = string | string[]
 
@@ -23,7 +24,10 @@ export interface Options {
      * @default true
      */
     useWindow?: boolean
-
+    /**
+     * magic-string generateMap options
+     */
+    sourceMapOptions?: Partial<SourceMapOptions>
     /**
      * debug console
      */
