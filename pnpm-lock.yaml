@@ -90,10 +90,12 @@ importers:
   examples/vite2.7:
     specifiers:
       '@vitejs/plugin-vue': ^1.10.2
+      vant: ^3.4.6
       vite: ^2.7.1
       vite-plugin-externals: workspace:*
       vue: ^3.2.24
     dependencies:
+      vant: 3.4.6_vue@3.2.24
       vue: 3.2.24
     devDependencies:
       '@vitejs/plugin-vue': 1.10.2_vite@2.7.1
@@ -680,6 +682,20 @@ packages:
       '@typescript-eslint/types': 4.26.1
       eslint-visitor-keys: 2.1.0
     dev: true
+
+  /@vant/icons/1.7.3:
+    resolution: {integrity: sha512-tW4EqzxN4kXw1rnlnQJQHofEifPbt/gECOWiibomht8QLyvoGuE4iUmDFS288dJ07ZjuTy0bhdABj0SENo2fmQ==}
+    dev: false
+
+  /@vant/popperjs/1.1.0:
+    resolution: {integrity: sha512-8MD1gz146awV/uPxYjz4pet22f7a9YVKqk7T+gFkWFwT9mEcrIUEg/xPrdOnWKLP9puXyYtm7oVfSDSefZ/p/w==}
+    dependencies:
+      '@popperjs/core': 2.9.3
+    dev: false
+
+  /@vant/use/1.3.6:
+    resolution: {integrity: sha512-3z+nywPaV2F5BdJO7RQxWlgfzJeEOmViD2yHMb7Tg+R4NR/7iQskqW8v2Cnv9FWSJgTOSHlcr7UzeLpiTAP4HA==}
+    dev: false
 
   /@vitejs/plugin-react-refresh/1.3.3:
     resolution: {integrity: sha512-J3KFwSQKrEK7fgOwTx0PMTlsolZORUch6BswjsM50q+Y7zSvX1ROIRn+tK2VE8SCvbYRHtzEKFlYW3vsWyTosQ==}
@@ -3786,6 +3802,17 @@ packages:
       spdx-correct: 3.1.1
       spdx-expression-parse: 3.0.1
     dev: true
+
+  /vant/3.4.6_vue@3.2.24:
+    resolution: {integrity: sha512-Ol1xhEXn2wjBAWqCyr4/0EKTCQEYbAzKyOP+bKYIWl+fbJXme8Aza5soeKvWA2KD9ZBU0qS7yBVGpr+76xUEXQ==}
+    peerDependencies:
+      vue: ^3.0.0
+    dependencies:
+      '@vant/icons': 1.7.3
+      '@vant/popperjs': 1.1.0
+      '@vant/use': 1.3.6
+      vue: 3.2.24
+    dev: false
 
   /vite-plugin-style-import/1.1.1_vite@2.3.7:
     resolution: {integrity: sha512-29NnvfAwCqS5zSg+bComXSmCgx3MmKJ/dPxWC/wa/yjG1gm7i/BDKrshiaGRXpIbMSyQco5KGRKhrUIW3Tr+nw==}

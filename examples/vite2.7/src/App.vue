@@ -1,8 +1,8 @@
 <template>
-  <el-button type="primary">test externals</el-button>
+  <button>test externals</button>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { reactive, ref } from 'vue';
 console.log(reactive({}))
 console.log(ref)
