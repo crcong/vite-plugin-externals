@@ -1,12 +1,12 @@
 import { TransformPluginContext } from 'rollup'
-import type { Plugin, Alias } from 'vite'
+import type { Alias, Plugin } from 'vite'
 import MagicString from 'magic-string'
 import { init, parse } from 'es-module-lexer'
 import { Parser } from 'acorn'
 import * as ESTree from 'estree'
-import { Externals, ExternalValue, Options } from './types'
+import { ExternalValue, Externals, Options } from './types'
 import { isObject } from './utils'
-import { ensureFile, writeFile, ensureDir, emptyDirSync } from 'fs-extra'
+import { emptyDirSync, ensureDir, ensureFile, writeFile } from 'fs-extra'
 import path from 'path'
 
 type Specifiers = (ESTree.ImportSpecifier | ESTree.ImportDefaultSpecifier | ESTree.ImportNamespaceSpecifier | ESTree.ExportSpecifier)[]
