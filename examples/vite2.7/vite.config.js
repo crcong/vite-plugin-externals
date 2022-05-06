@@ -2,16 +2,16 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { viteExternalsPlugin } from 'vite-plugin-externals'
 
-export default defineConfig(async({ mode }) => {
+export default defineConfig(async() => {
   return {
     plugins: [
       vue(),
-      mode === 'production'
-        ? viteExternalsPlugin({
-          vue: 'Vue',
-          vant: 'vant',
-        })
-        : undefined,
+      viteExternalsPlugin({
+        vue: 'Vue',
+        vant: 'vant',
+      }, {
+        disableInServe: true,
+      }),
     ],
   }
 })

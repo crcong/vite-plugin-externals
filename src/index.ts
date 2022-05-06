@@ -19,7 +19,6 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: User
   const options = resolveOptions(userOptions)
   const externalsKeys = Object.keys(externals)
   const isExternalEmpty = externalsKeys.length === 0
-  const cachePath = path.join(process.cwd(), NODE_MODULES_FLAG, CACHE_DIR)
 
   const transformModuleName: TransformModuleNameFn = (externalValue) => {
     const { useWindow } = options
@@ -42,6 +41,9 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: User
       if (!isServe) {
         return
       }
+      if (options.disableInServe) {
+        return
+      }
       if (isExternalEmpty) {
         return
       }
@@ -55,6 +57,7 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: User
         newAlias.push(...alias)
       }
 
+      const cachePath = path.join(process.cwd(), NODE_MODULES_FLAG, CACHE_DIR)
       await ensureDir(cachePath)
       await emptyDirSync(cachePath)
 
@@ -77,6 +80,10 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: User
     },
     async transform(code, id, _options) {
       const ssr = compatSsrInOptions(_options)
+
+      if (isServe && options.disableInServe) {
+        return
+      }
       if (!isNeedExternal.call(this, options, code, id, isBuild, ssr)) {
         return
       }

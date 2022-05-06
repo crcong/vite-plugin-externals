@@ -8,10 +8,15 @@ export type Externals = Record<string, ExternalValue>
 
 export interface Options {
     /**
+     * disable externals in serve
+     * @default false
+     */
+     disableInServe: boolean
+    /**
      * disable externals in ssr
      * @default true
      */
-    disableSsr: boolean,
+    disableSsr: boolean
     /**
      * filter does not require external function
      * return false is not external
