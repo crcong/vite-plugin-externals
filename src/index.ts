@@ -14,6 +14,7 @@ import { replaceImports, replaceRequires } from './replace'
 
 export function viteExternalsPlugin(externals: Externals = {}, userOptions: UserOptions = {}): Plugin {
   let isBuild = false
+  let isServe = false
 
   const options = resolveOptions(userOptions)
   const externalsKeys = Object.keys(externals)
@@ -34,10 +35,11 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: User
 
   return {
     name: 'vite-plugin-externals',
-    async config(config, { mode, command }) {
+    async config(config, { command }) {
       isBuild = command === 'build'
+      isServe = command === 'serve'
 
-      if (mode !== 'development') {
+      if (!isServe) {
         return
       }
       if (isExternalEmpty) {
