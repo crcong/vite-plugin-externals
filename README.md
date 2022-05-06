@@ -38,14 +38,14 @@ export default {
       vue: 'Vue',
       react: 'React',
       'react-dom': 'ReactDOM',
-      // value support chain, tranform to window['React']['lazy']
+      // value support chain, transform to window['React']['lazy']
       lazy: ['React', 'lazy']
     }),
   ]
 }
 ```
 
-**Warning**: If you loaded `production` libray in `vite dev mode` , may make `HMR` **fail**.
+**Warning**: If you loaded `production` library in `vite dev mode` , may make `HMR` **fail**.
 
 Eg.
 ```html
@@ -94,7 +94,7 @@ import vue from '@vitejs/plugin-vue'
 
 export default {
   plugins: [
-    vue(), // @vitejs/plugin-vue will transofrm SFC to JS code
+    vue(), // @vitejs/plugin-vue will transform SFC to JS code
 
     // It should be under @vitejs/plugin-vue
     viteExternalsPlugin({
