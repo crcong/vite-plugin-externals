@@ -47,6 +47,8 @@ export default {
 
 **Warning**: If you loaded `production` library in `vite dev mode` , may make `HMR` **fail**.
 
+You can use `disableInServe: true` option to avoid transform in serve mode.
+
 Eg.
 ```html
 <!-- may make HMR fail -->
@@ -105,6 +107,16 @@ export default {
 ```
 
 ## Configuration
+
+### disableInServe
+
+disable transform in `serve mode` .
+
+```js
+viteExternalsPlugin({
+  vue: 'Vue',
+}, { disableInServe: true })
+```
 
 ### filter
 

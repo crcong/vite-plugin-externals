@@ -47,6 +47,8 @@ export default {
 
 **警告**: 如果你在开发环境中，引入了生产环境的库, 可能会使得 `HMR` 失败。
 
+你也可以使用 `disableInServe: true` 避免在 serve 模式中转换。
+
 例如：
 ```html
 <!-- 可能会使 HMR 失败 -->
@@ -105,6 +107,16 @@ export default {
 ```
 
 ## 配置选项
+
+### disableInServe
+
+在 `serve` 模式中禁止转换 `external` 代码。
+
+```js
+viteExternalsPlugin({
+  vue: 'Vue',
+}, { disableInServe: true })
+```
 
 ### filter
 
