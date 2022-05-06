@@ -11,25 +11,29 @@ export interface Options {
      * disable externals in ssr
      * @default true
      */
-    disableSsr?: boolean,
+    disableSsr: boolean,
     /**
      * filter does not require external function
      * return false is not external
      */
-    filter?: (this: TransformPluginContext, code: string, id: string, ssr?: boolean) => boolean
+    filter: (this: TransformPluginContext, code: string, id: string, ssr: boolean, isBuild: boolean) => boolean
     /**
      * eg. externals: { vue: 'Vue' }
      * set `true`: import Vue from 'vue' => const Vue = window.Vue;
      * set `false`: eg. import Vue from 'vue' => const Vue = Vue;
      * @default true
      */
-    useWindow?: boolean
+    useWindow: boolean
     /**
      * magic-string generateMap options
      */
-    sourceMapOptions?: Partial<SourceMapOptions>
+    sourceMapOptions: Partial<SourceMapOptions>
     /**
      * debug console
      */
-    debug?: boolean
+    debug: boolean
 }
+
+export type UserOptions = Partial<Options>
+
+export type TransformModuleNameFn = (externalValue: ExternalValue) => string

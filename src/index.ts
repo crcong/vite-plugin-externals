@@ -3,39 +3,34 @@ import type { Alias, Plugin } from 'vite'
 import MagicString from 'magic-string'
 import { init, parse } from 'es-module-lexer'
 import { Parser } from 'acorn'
-import * as ESTree from 'estree'
-import { ExternalValue, Externals, Options } from './types'
+import { Externals, Options, TransformModuleNameFn, UserOptions } from './types'
 import { isObject } from './utils'
 import { emptyDirSync, ensureDir, ensureFile, writeFile } from 'fs-extra'
 import path from 'path'
+import { resolveOptions } from './options'
+import { CACHE_DIR, NODE_MODULES_FLAG } from './constant'
+import * as ESTree from 'estree'
+import { replaceImports, replaceRequires } from './replace'
 
-type Specifiers = (ESTree.ImportSpecifier | ESTree.ImportDefaultSpecifier | ESTree.ImportNamespaceSpecifier | ESTree.ExportSpecifier)[]
-type TransformModuleNameFn = (externalValue: ExternalValue) => string
-
-// constants
-const ID_FILTER_REG = /\.(mjs|js|ts|vue|jsx|tsx)(\?.*|)$/
-const NODE_MODULES_FLAG = 'node_modules'
-const CACHE_DIR = '.vite-plugin-externals'
-
-export function viteExternalsPlugin(externals: Externals = {}, userOptions: Options = {}): Plugin {
+export function viteExternalsPlugin(externals: Externals = {}, userOptions: UserOptions = {}): Plugin {
   let isBuild = false
 
+  const options = resolveOptions(userOptions)
   const externalsKeys = Object.keys(externals)
   const isExternalEmpty = externalsKeys.length === 0
   const cachePath = path.join(process.cwd(), NODE_MODULES_FLAG, CACHE_DIR)
 
-  const transformModuleName: TransformModuleNameFn = ((useWindow) => {
-    return (externalValue: ExternalValue) => {
-      if (useWindow === false) {
-        return typeof externalValue === 'string' ? externalValue : externalValue.join('.')
-      }
-      if (typeof externalValue === 'string') {
-        return `window['${externalValue}']`
-      }
-      const vals = externalValue.map((val) => `['${val}']`).join('')
-      return `window${vals}`
+  const transformModuleName: TransformModuleNameFn = (externalValue) => {
+    const { useWindow } = options
+    if (useWindow === false) {
+      return typeof externalValue === 'string' ? externalValue : externalValue.join('.')
     }
-  })(userOptions.useWindow ?? true)
+    if (typeof externalValue === 'string') {
+      return `window['${externalValue}']`
+    }
+    const values = externalValue.map((val) => `['${val}']`).join('')
+    return `window${values}`
+  }
 
   return {
     name: 'vite-plugin-externals',
@@ -78,9 +73,9 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
 
       return config
     },
-    async transform(code, id, options) {
-      const ssr = compatSsrInOptions(options)
-      if (!isNeedExternal.call(this, userOptions, code, id, isBuild, ssr)) {
+    async transform(code, id, _options) {
+      const ssr = compatSsrInOptions(_options)
+      if (!isNeedExternal.call(this, options, code, id, isBuild, ssr)) {
         return
       }
       let s: undefined | MagicString
@@ -146,77 +141,6 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: Opti
   }
 }
 
-function replaceRequires(
-  code: string,
-  externals: Externals,
-  transformModuleName: TransformModuleNameFn,
-) {
-  // It's not a good method, but I feel it can cover most scenes
-  return Object.keys(externals).reduce((code, externalKey) => {
-    const r = new RegExp(`require\\((["'\`])\\s*${externalKey}\\s*(\\1)\\)`, 'g')
-    return code.replace(r, transformModuleName(externals[externalKey]))
-  }, code)
-}
-
-function replaceImports(
-  specifiers: Specifiers,
-  externalValue: ExternalValue,
-  transformModuleName: TransformModuleNameFn,
-) {
-  return specifiers.reduce((s, specifier) => {
-    const { local } = specifier
-    if (specifier.type === 'ImportDefaultSpecifier') {
-      /**
-       * source code: import Vue from 'vue'
-       * transformed: const Vue = window['Vue']
-       */
-      s += `const ${local.name} = ${transformModuleName(externalValue)}\n`
-    } else if (specifier.type === 'ImportSpecifier') {
-      /**
-       * source code:
-       * import { reactive, ref as r } from 'vue'
-       * transformed:
-       * const reactive = window['Vue'].reactive
-       * const r = window['Vue'].ref
-       */
-      const { imported } = specifier
-      s += `const ${local.name} = ${transformModuleName(externalValue)}.${imported.name}\n`
-    } else if (specifier.type === 'ImportNamespaceSpecifier') {
-      /**
-       * source code: import * as vue from 'vue'
-       * transformed: const vue = window['Vue']
-       */
-      s += `const ${local.name} = ${transformModuleName(externalValue)}\n`
-    } else if (specifier.type === 'ExportSpecifier') {
-      /**
-       * Re-export default import as named export
-       * source code: export { default as React } from 'react'
-       * transformed: export const React = window['React']
-       *
-       * Re-export default import as default export
-       * source code: export { default } from 'react'
-       * transformed: export default = window['React']
-       *
-       * Re-export named import
-       * source code: export { useState } from 'react'
-       * transformed: export const useState = window['React'].useState
-       *
-       * Re-export named import as renamed export
-       * source code: export { useState as useState2 } from 'react'
-       * transformed: export const useState2 = window['React'].useState
-       */
-      const { exported } = specifier
-      const value = `${transformModuleName(externalValue)}${local.name !== 'default' ? `.${local.name}` : ''}`
-      if (exported.name === 'default') {
-        s += `export default ${value}\n`
-      } else {
-        s += `export const ${exported.name} = ${value}\n`
-      }
-    }
-    return s
-  }, '')
-}
-
 function isNeedExternal(
   this: TransformPluginContext,
   options: Options,
@@ -234,19 +158,7 @@ function isNeedExternal(
     return false
   }
 
-  if (typeof filter === 'function') {
-    if (!filter.call(this, code, id, ssr)) {
-      return false
-    }
-  } else {
-    if (
-      !ID_FILTER_REG.test(id) ||
-      (id.includes(NODE_MODULES_FLAG) && !isBuild)
-    ) {
-      return false
-    }
-  }
-  return true
+  return filter.call(this, code, id, ssr ?? false, isBuild)
 }
 
 function compatSsrInOptions(options: { ssr?: boolean } | undefined): boolean {
