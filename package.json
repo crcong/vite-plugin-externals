@@ -30,7 +30,7 @@
   "main": "dist/index.js",
   "module": "dist/es/index.js",
   "peerDependencies": {
-    "vite": "^2.0.0"
+    "vite": ">=2.0.0"
   },
   "devDependencies": {
     "@crcong/eslint-config-typescript": "^0.3.0",
