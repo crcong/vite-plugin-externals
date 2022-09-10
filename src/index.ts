@@ -2,24 +2,15 @@ import { TransformPluginContext } from 'rollup'
 import type { Alias, Plugin } from 'vite'
 import MagicString from 'magic-string'
 import { init, parse } from 'es-module-lexer'
-import { Parser } from 'acorn'
 import { Externals, Options, TransformModuleNameFn, UserOptions } from './types'
 import { isObject } from './utils'
 import { emptyDirSync, ensureDir, ensureFile, writeFile } from 'fs-extra'
 import path from 'path'
 import { resolveOptions } from './options'
 import { CACHE_DIR, NODE_MODULES_FLAG } from './constant'
-import * as ESTree from 'estree'
-import { replaceImports, replaceRequires } from './replace'
+import { transformImports, transformRequires } from './transform'
 
-export function viteExternalsPlugin(externals: Externals = {}, userOptions: UserOptions = {}): Plugin {
-  let isBuild = false
-  let isServe = false
-
-  const options = resolveOptions(userOptions)
-  const externalsKeys = Object.keys(externals)
-  const isExternalEmpty = externalsKeys.length === 0
-
+export const createTransformModuleName = (options: Options) => {
   const transformModuleName: TransformModuleNameFn = (externalValue) => {
     const { useWindow } = options
     if (useWindow === false) {
@@ -31,6 +22,18 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: User
     const values = externalValue.map((val) => `['${val}']`).join('')
     return `window${values}`
   }
+  return transformModuleName
+}
+
+export function viteExternalsPlugin(externals: Externals = {}, userOptions: UserOptions = {}): Plugin {
+  let isBuild = false
+  let isServe = false
+
+  const options = resolveOptions(userOptions)
+  const externalsKeys = Object.keys(externals)
+  const isExternalEmpty = externalsKeys.length === 0
+
+  const transformModuleName = createTransformModuleName(options)
 
   return {
     name: 'vite-plugin-externals',
@@ -91,7 +94,7 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: User
       let hasError = false
       try {
         if (isBuild && id.includes(NODE_MODULES_FLAG)) {
-          code = replaceRequires(code, externals, transformModuleName)
+          code = transformRequires(code, externals, transformModuleName)
         }
         await init
         const [imports] = parse(code)
@@ -118,15 +121,7 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: User
           s = s || (s = new MagicString(code))
 
           const raw = code.substring(statementStart, statementEnd)
-          const ast = Parser.parse(raw, {
-            ecmaVersion: 'latest',
-            sourceType: 'module',
-          }) as unknown as ESTree.Program
-          const specifiers = (ast.body[0] as (ESTree.ImportDeclaration))?.specifiers
-          if (!specifiers) {
-            return
-          }
-          const newImportStr = replaceImports(specifiers, externalValue, transformModuleName)
+          const newImportStr = transformImports(raw, externalValue, transformModuleName)
           s.overwrite(statementStart, statementEnd, newImportStr)
         })
       } catch (error) {
@@ -150,7 +145,7 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: User
   }
 }
 
-function isNeedExternal(
+export function isNeedExternal(
   this: TransformPluginContext,
   options: Options,
   code: string,

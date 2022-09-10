@@ -10,6 +10,7 @@
     "strict": true,
     "moduleResolution": "Node",
     "esModuleInterop": true,
+    "types": ["node", "vitest/globals"]
   },
   "files": [
     "./src/index.ts"
@@ -17,5 +18,9 @@
   "exclude": [
     "dist",
     "node_modules"
+  ],
+  "include": [
+    "test/**/*.ts",
+    "src/**/*.ts"
   ]
 }

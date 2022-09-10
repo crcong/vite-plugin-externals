@@ -1,13 +1,22 @@
-import { ExternalValue, Externals, TransformModuleNameFn } from './types'
+import { Parser } from 'acorn'
 import * as ESTree from 'estree'
+import { ExternalValue, Externals, TransformModuleNameFn } from './types'
 
 type Specifiers = (ESTree.ImportSpecifier | ESTree.ImportDefaultSpecifier | ESTree.ImportNamespaceSpecifier | ESTree.ExportSpecifier)[]
 
-export function replaceImports(
-  specifiers: Specifiers,
+export const transformImports = (
+  raw: string,
   externalValue: ExternalValue,
   transformModuleName: TransformModuleNameFn,
-) {
+): string => {
+  const ast = Parser.parse(raw, {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+  }) as unknown as ESTree.Program
+  const specifiers = (ast.body[0] as (ESTree.ImportDeclaration))?.specifiers as Specifiers
+  if (!specifiers) {
+    return ''
+  }
   return specifiers.reduce((s, specifier) => {
     const { local } = specifier
     if (specifier.type === 'ImportDefaultSpecifier') {
@@ -40,7 +49,7 @@ export function replaceImports(
        *
        * Re-export default import as default export
        * source code: export { default } from 'react'
-       * transformed: export default = window['React']
+       * transformed: export default window['React']
        *
        * Re-export named import
        * source code: export { useState } from 'react'
@@ -62,7 +71,7 @@ export function replaceImports(
   }, '')
 }
 
-export function replaceRequires(
+export function transformRequires(
   code: string,
   externals: Externals,
   transformModuleName: TransformModuleNameFn,

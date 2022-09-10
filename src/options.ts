@@ -1,7 +1,7 @@
 import { Options, UserOptions } from './types'
 import { ID_FILTER_REG, NODE_MODULES_FLAG } from './constant'
 
-const defaultOptions: Options = {
+export const defaultOptions: Options = {
   disableInServe: false,
   disableSsr: true,
   filter(_, id, __, isBuild) {
