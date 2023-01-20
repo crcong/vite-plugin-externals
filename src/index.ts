@@ -74,12 +74,11 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: User
         )
       }
 
-      config.resolve = {
-        ...(config.resolve ?? {}),
-        alias: newAlias,
+      return {
+        resolve: {
+          alias: newAlias,
+        },
       }
-
-      return config
     },
     async transform(code, id, _options) {
       const ssr = compatSsrInOptions(_options)
