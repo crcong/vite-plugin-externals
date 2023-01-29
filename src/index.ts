@@ -37,6 +37,7 @@ export function viteExternalsPlugin(externals: Externals = {}, userOptions: User
 
   return {
     name: 'vite-plugin-externals',
+    ...(userOptions.enforce ? { enforce: userOptions.enforce } : {}),
     async config(config, { command }) {
       isBuild = command === 'build'
       isServe = command === 'serve'

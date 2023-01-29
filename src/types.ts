@@ -1,6 +1,7 @@
 
 import { TransformPluginContext } from 'rollup'
 import { SourceMapOptions } from 'magic-string'
+import type { Plugin } from 'vite'
 
 export type ExternalValue = string | string[]
 
@@ -29,6 +30,11 @@ export interface Options {
      * @default true
      */
     useWindow: boolean
+    /**
+     * vite plugin ordering
+     * @see https://vitejs.dev/guide/api-plugin.html#plugin-ordering
+     */
+    enforce?: Plugin['enforce']
     /**
      * magic-string generateMap options
      */
