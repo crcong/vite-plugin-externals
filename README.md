@@ -106,6 +106,8 @@ export default {
 }
 ```
 
+If an error occurs, you can check whether the error is caused by the plugin order.
+
 ## Configuration
 
 ### disableInServe
@@ -117,6 +119,13 @@ viteExternalsPlugin({
   vue: 'Vue',
 }, { disableInServe: true })
 ```
+
+
+### enforce
+
+vite plugin ordering. Resolve plugin ordering cause unexpected error. Such as [#21](https://github.com/crcong/vite-plugin-externals/issues/21).
+
+See [https://vitejs.dev/guide/api-plugin.html#plugin-ordering](https://vitejs.dev/guide/api-plugin.html#plugin-ordering).
 
 ### filter
 

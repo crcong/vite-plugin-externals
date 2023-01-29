@@ -106,6 +106,8 @@ export default {
 }
 ```
 
+如果出现异常报错，可以查看是否因为插件顺序引起的报错。
+
 ## 配置选项
 
 ### disableInServe
@@ -117,6 +119,12 @@ viteExternalsPlugin({
   vue: 'Vue',
 }, { disableInServe: true })
 ```
+
+### enforce
+
+vite 插件顺序。 解决由于 vite 插件顺序引起的异常。 例如 [#21](https://github.com/crcong/vite-plugin-externals/issues/21).
+
+详细可以查看 [https://vitejs.dev/guide/api-plugin.html#plugin-ordering](https://vitejs.dev/guide/api-plugin.html#plugin-ordering) 。
 
 ### filter
 
