@@ -79,6 +79,10 @@ export function transformRequires(
   // It's not a good method, but I feel it can cover most scenes
   return Object.keys(externals).reduce((code, externalKey) => {
     const r = new RegExp(`require\\((["'\`])\\s*${externalKey}\\s*(\\1)\\)`, 'g')
-    return code.replace(r, transformModuleName(externals[externalKey]))
+    /**
+     * fix RegExp special replacement patterns
+     * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#specifying_a_string_as_the_replacement
+     */
+    return code.replace(r, () => transformModuleName(externals[externalKey]))
   }, code)
 }
