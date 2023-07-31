@@ -60,5 +60,15 @@ describe('transformRequire', () => {
       transformRequires(`const { reactive, ref } = require('vue');`, { vue: 'Vue' }, transformModuleName),
     )
       .toBe(`const { reactive, ref } = window['Vue'];`)
+
+    expect(
+      transformRequires(`const { reactive, ref } = require('vue');`, { vue: ['$', 'Vue'] }, transformModuleName),
+    )
+      .toBe(`const { reactive, ref } = window['$']['Vue'];`)
+
+    expect(
+      transformRequires(`const { reactive, ref } = require('vue');`, { vue: ['$$', 'Vue'] }, transformModuleName),
+    )
+      .toBe(`const { reactive, ref } = window['$$']['Vue'];`)
   })
 })
